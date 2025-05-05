@@ -84,11 +84,19 @@
 </div>
 
 <script>
+  
+/// 貪食蛇遊戲
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const grid = 20;
-let snake = [{ x: 160, y: 160 }];
-let apple = { x: 320, y: 320 };
+
+// 新增蘋果圖示
+const appleImg = new Image();
+appleImg.src = 'https://cdn-icons-png.flaticon.com/512/415/415682.png'; // 可換你喜歡的圖
+
+// 內容物 
+let snake = [{ x: 160, y: 160 }]; // 蛇的初始位置
+let apple = { x: 320, y: 320 }; // 蘋果的初始位置
 let dx = grid;
 let dy = 0;
 let score = 0;
@@ -126,10 +134,11 @@ function gameLoop() {
     snake.pop();
   }
 
-  ctx.fillStyle = 'pink';
-  ctx.beginPath();
-  ctx.arc(apple.x + grid/2, apple.y + grid/2, grid/2 - 2, 0, 2 * Math.PI);
-  ctx.fill();
+  // ctx.fillStyle = 'pink';
+  // ctx.beginPath();
+  // ctx.arc(apple.x + grid/2, apple.y + grid/2, grid/2 + 1, 0, 2 * Math.PI);
+  // ctx.fill();
+  ctx.drawImage(appleImg, apple.x, apple.y, grid*1.5, grid*1.5);
 
   // 畫蛇
   snake.forEach((part, index) => {
@@ -137,7 +146,7 @@ function gameLoop() {
       // 蛇頭
       ctx.fillStyle = '#90ee90';
       ctx.beginPath();
-      ctx.arc(part.x + grid/2, part.y + grid/2, grid/2 - 2, 0, 2 * Math.PI);
+      ctx.arc(part.x + grid/2, part.y + grid/2, grid/2 + 3, 0, 2 * Math.PI);
       ctx.fill();
 
       // 眼睛
