@@ -99,11 +99,12 @@ let speed = 100;
 function getRandomPosition() {
   return Math.floor(Math.random() * 20) * grid;
 }
+
 function updateScoreboard() {
   document.getElementById('score').innerText = score;
   document.getElementById('highScore').innerText = highScore;
   document.getElementById('deathCount').innerText = deathCount;
-  }
+}
 
 function gameLoop() {
   requestAnimationFrame(gameLoop);
@@ -130,6 +131,7 @@ function gameLoop() {
   ctx.arc(apple.x + grid/2, apple.y + grid/2, grid/2 - 2, 0, 2 * Math.PI);
   ctx.fill();
 
+  // 畫蛇
   snake.forEach((part, index) => {
     if (index === 0) {
       // 蛇頭
@@ -162,6 +164,7 @@ function gameLoop() {
       resetGame();
     }
   }
+  updateScoreboard(); // 每一輪遊戲循環後更新分數
 }
 
 function resetGame() {
