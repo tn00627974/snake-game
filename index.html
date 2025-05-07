@@ -62,8 +62,24 @@
       font-size: 20px;
     }
   </style>
+  <script>
+    // 背景音效
+    const bgAudio = new Audio('./audio/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3');
+    bgAudio.loop = true;
+    bgAudio.volume = 0.1;
+
+    // 吃蘋果音效
+    const eatAppleAudio = new Audio('./audio/hitting.mp3');URL
+    bgAudio.volume = 0.1; 
+
+    // 修正吃蘋果音效的延遲問題
+    function playEatAppleSound() {
+      eatAppleAudio.currentTime = 0; // 重置播放時間
+      eatAppleAudio.play(); // 播放音效
+    }
+  </script>
 </head>
-<body>
+<body onload="bgAudio.play()">
 <h1>貪食蛇</h1>
 <div class="scoreboard">
   <div>得分: <span id="score">0</span></div>
@@ -102,7 +118,7 @@ let dy = 0;
 let score = 0;
 let highScore = 0;
 let deathCount = 0;
-let speed = 100;
+let speed = 200; // 降低蛇的初始速度
 
 function getRandomPosition() {
   return Math.floor(Math.random() * 20) * grid;
@@ -130,6 +146,8 @@ function gameLoop() {
     score++;
     if (score > highScore) highScore = score;
     if (speed > 20) speed -= 2;
+
+    playEatAppleSound(); // 播放吃蘋果音效
   } else {
     snake.pop();
   }
