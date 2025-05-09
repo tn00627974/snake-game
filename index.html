@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>貪食蛇</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"> <!-- Google 字體 -->
+  <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet"> -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -37,8 +37,8 @@
 
   <h1>貪食蛇</h1>
   <div class="scoreboard">
-    <div>得分: <span id="score">0</span></div>
-    <div>最高得分: <span id="highScore">0</span></div>
+    <div>得分 : <span id="score">0</span></div>
+    <div>最高得分 : <span id="highScore">0</span></div>
     <div>死亡次數: <span id="deathCount">0</span></div>
   </div>
   <canvas id="gameCanvas" width="400" height="400"></canvas>
@@ -47,11 +47,11 @@
     <button class="control-btn" id="upBtn">⬆️</button>
     <div></div>
     <button class="control-btn" id="leftBtn">⬅️</button>
-    <div></div>
-    <button class="control-btn" id="rightBtn">➡️</button>
-    <div></div>
     <button class="control-btn" id="downBtn">⬇️</button>
+    <button class="control-btn" id="rightBtn">➡️</button>
+    <!-- <div></div>
     <div></div>
+    <div></div> -->
   </div>
 
 
@@ -225,7 +225,16 @@ document.getElementById('downBtn').addEventListener('click', () => {
 
 // === 更新按鈕 ===
 document.getElementById('updateBtn').onclick = function() {
-  alert('v0.2 \n- ===新增===\n- 開始按鈕特效 \n 音效優化\n- ===修復===\n- 蘋果隨機產生位置不貼近邊界 \n- 蛇會亂數變黑色問題！');
+  alert([
+    'v0.2',
+    '=== 新增 ===',
+    '• 開始按鈕特效',
+    '• 音效優化',
+    '',
+    '=== 修復 ===',
+    '• 蘋果隨機產生位置不貼近邊界',
+    '• 蛇會亂數變黑色問題！'
+  ].join('\n'));
 };
 
 // === 開始遊戲按鈕 ===
