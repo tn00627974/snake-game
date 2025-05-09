@@ -5,167 +5,85 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>貪食蛇</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"> <!-- Google 字體 -->
-  <style>
-    body {
-      background: linear-gradient(to bottom, #1e3c72, #2a5298);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      font-family: "Press Start 2P", cursive; /* 使用漂亮字體 */
-      color: #fff;
-    }
-    h1 {
-      margin-bottom: 20px;
-    }
-    canvas {
-      background: #111;
-      border: 4px solid #fff;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    }
-    .controls {
-      margin-top: 20px;
-      display: grid;
-      grid-template-columns: 60px 60px 60px;
-      grid-gap: 10px;
-      justify-content: center;
-    }
-    .control-btn {
-      width: 60px;
-      height: 60px;
-      font-size: 24px;
-      background: #fff;
-      color: #1e3c72;
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-      cursor: pointer;
-      user-select: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .control-btn:active {
-      background: #ddd;
-    }
-    .scoreboard {
-      font-size: 18px;
-      margin-top: 10px;
-      display: flex;
-      justify-content: space-between;
-      width: 400px;
-    }
-    .scoreboard div {
-      font-size: 20px;
-    }
-    .startBtn{
-      position : fixed ;
-      display : flex;
-      align-items: center;
-      justify-content : center;
-      font-size : 30px; 
-      padding : 10px ; background-color: #fff; 
-      color: #1e3c72; 
-      border: none; 
-      border-radius: 8px; 
-      cursor: pointer;
-    }
-    .updateBtn{
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 200;
-      font-size: 18px;
-      padding: 8px 18px;
-      background: #ffee00;
-      color: #1e3c72;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-  </style>
-  <button id="startGameBtn" class="startBtn">開始遊戲</button>
-  <script>
-    // 背景音效
-    const bgAudio = new Audio('./audio/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3');
-    bgAudio.loop = true;
-    bgAudio.volume = 0.1;
-
-    let isGameRunning = false;
-    document.getElementById('startGameBtn').addEventListener('click', () => {
-  if (!isGameRunning) {
-    isGameRunning = true; // 標記遊戲正在運行
-    bgAudio.play(); // 播放背景音樂
-    document.getElementById('startGameBtn').style.display = 'none'; // 隱藏按鈕
-    resetGame(); // 重置遊戲
-    requestAnimationFrame(gameLoop); // 開始遊戲循環
-  }
-});
-
-
-    // 吃蘋果音效
-    const eatAppleAudio = new Audio('./audio/hitting.mp3');
-    bgAudio.volume = 0.1; 
-
-    // 修正吃蘋果音效的延遲問題
-    function playEatAppleSound() {
-      eatAppleAudio.currentTime = 0; // 重置播放時間
-      eatAppleAudio.play(); // 播放音效
-    }
-    document.getElementById('updateBtn').onclick = function() {
-  alert('v0.1 新增：\n- 蛇身變色\n- 背景音效 \n- 修復:蘋果超出範圍會吃不到的問題 \n- 更多功能陸續推出！');
-};
-  </script>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-<body onload="bgAudio.play()">
+<body>
   <button id="updateBtn" class="updateBtn">更新項目</button>
-<h1>貪食蛇</h1>
-<div class="scoreboard">
-  <div>得分: <span id="score">0</span></div>
-  <div>最高得分: <span id="highScore">0</span></div>
-  <div>死亡次數: <span id="deathCount">0</span></div>
-</div>
-<canvas id="gameCanvas" width="400" height="400"></canvas>
-<div class="controls">
-  <div></div>
-  <button class="control-btn" id="upBtn">⬆️</button>
-  <div></div>
-  <button class="control-btn" id="leftBtn">⬅️</button>
-  <div></div>
-  <button class="control-btn" id="rightBtn">➡️</button>
-  <div></div>
-  <button class="control-btn" id="downBtn">⬇️</button>
-  <div></div>
-</div>
+    <!-- 修改開始遊戲按鈕，使用 .button 樣式與動畫字母 -->
+  <button id="startGameBtn" class="startButton" type="button">
+    <span class="outline"></span>
+    <span class="state state--default">
+      <span class="icon">
+        <svg 
+        
+        xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-worm-icon lucide-worm"><path d="m19 12-1.5 3"/><path d="M19.63 18.81 22 20"/><path d="M6.47 8.23a1.68 1.68 0 0 1 2.44 1.93l-.64 2.08a6.76 6.76 0 0 0 10.16 7.67l.42-.27a1 1 0 1 0-2.73-4.21l-.42.27a1.76 1.76 0 0 1-2.63-1.99l.64-2.08A6.66 6.66 0 0 0 3.94 3.9l-.7.4a1 1 0 1 0 2.55 4.34z"/></svg>
+      </span>
+      <p>
+        <span style="--i:1">開</span>
+        <span style="--i:2">始</span>
+        <span style="--i:3">遊</span>
+        <span style="--i:4">戲</span>
+      </p>
+    </span>
+    <span class="state state--sent">
+      <span class="icon"></span>
+      <p>
+        <span style="--i:1">G</span>
+        <span style="--i:2">O</span>
+        <span style="--i:3">!</span>
+      </p>
+    </span>
+  </button>
+
+  <h1>貪食蛇</h1>
+  <div class="scoreboard">
+    <div>得分: <span id="score">0</span></div>
+    <div>最高得分: <span id="highScore">0</span></div>
+    <div>死亡次數: <span id="deathCount">0</span></div>
+  </div>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <div class="controls">
+    <div></div>
+    <button class="control-btn" id="upBtn">⬆️</button>
+    <div></div>
+    <button class="control-btn" id="leftBtn">⬅️</button>
+    <div></div>
+    <button class="control-btn" id="rightBtn">➡️</button>
+    <div></div>
+    <button class="control-btn" id="downBtn">⬇️</button>
+    <div></div>
+  </div>
+
 
 <script>
-/// 貪食蛇遊戲
+
+// === 音效與變數 ===
+const bgAudio = new Audio('./audio/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3');
+bgAudio.loop = true;
+bgAudio.volume = 0.1;
+const eatAppleAudio = new Audio('./audio/hitting.mp3');
+eatAppleAudio.volume = 0.1;
+
+function playEatAppleSound() {
+  eatAppleAudio.currentTime = 0;
+  eatAppleAudio.play();
+}
+
+// === 遊戲主程式 ===
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const grid = 20;
-const initialSpeed = 200; // 定義初始速度
-
-// 新增蘋果圖示
+const initialSpeed = 200;
 const appleImg = new Image();
-appleImg.src = 'https://cdn-icons-png.flaticon.com/512/415/415682.png'; // 可換你喜歡的圖
+appleImg.src = 'https://cdn-icons-png.flaticon.com/512/415/415682.png';
 
-// 內容物 
-let snake = [{ x: 160, y: 160 }]; // 蛇的初始位置
-let apple = { x: 320, y: 320 }; // 蘋果的初始位置
-let dx = grid;
-let dy = 0;
-let score = 0;
-let highScore = 0;
-let deathCount = 0;
-let speed = initialSpeed; // 降低蛇的初始速度
-let snakeColor = '#7ccd7c';
+let snake, apple, dx, dy, score, highScore = 0, deathCount = 0, speed, snakeColor, count, 
+isGameRunning = false;
 
 function getRandomPosition() {
-  return Math.floor(Math.random() * 20) * grid;
+  const min = 1;
+  const max = 18;
+  return Math.floor(Math.random() * (max - min + 1) + min) * grid;
 }
 
 function updateScoreboard() {
@@ -174,7 +92,45 @@ function updateScoreboard() {
   document.getElementById('deathCount').innerText = deathCount;
 }
 
+function drawSnakeAndApple() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(appleImg, apple.x, apple.y, grid*1.5, grid*1.5);
+  snake.forEach((part, index) => {
+    if (index === 0) {
+      ctx.fillStyle = '#90ee90';
+      ctx.beginPath();
+      ctx.arc(part.x + grid/2, part.y + grid/2, grid/2 + 3, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.fillStyle = 'black';
+      ctx.beginPath();
+      ctx.arc(part.x + grid/2 - 4, part.y + grid/2 - 4, 2, 0, 2 * Math.PI);
+      ctx.arc(part.x + grid/2 + 4, part.y + grid/2 - 4, 2, 0, 2 * Math.PI);
+      ctx.fill();
+    } else {
+      ctx.fillStyle = '#90ee90';
+      ctx.beginPath();
+      ctx.arc(part.x + grid/2, part.y + grid/2, grid/2 - 2, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+  });
+}
+
+function resetGame(isDeath = false) {
+  snake = [{ x: 160, y: 160 }];
+  dx = grid;
+  dy = 0;
+  apple = { x: getRandomPosition(), y: getRandomPosition() };
+  score = 0;
+  speed = initialSpeed;
+  snakeColor = '#7ccd7c';
+  count = Math.floor(speed / 10); // 讓 gameLoop 立即執行
+  if (isDeath) deathCount++;
+  updateScoreboard();
+  drawSnakeAndApple();
+}
+
 function gameLoop() {
+  if (!isGameRunning) return;
   requestAnimationFrame(gameLoop);
 
   if (++count < speed / 10) return;
@@ -190,32 +146,29 @@ function gameLoop() {
     score++;
     if (score > highScore) highScore = score;
     if (speed > 20) speed -= 2;
-    snakeColor = '#' + Math.floor(Math.random()*16777215).toString(16);
-    playEatAppleSound(); // 播放吃蘋果音效
+    // snakeColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+    playEatAppleSound();
   } else {
     snake.pop();
   }
 
   ctx.drawImage(appleImg, apple.x, apple.y, grid*1.5, grid*1.5);
 
-  // 畫蛇
   snake.forEach((part, index) => {
     if (index === 0) {
-      // 蛇頭
-      ctx.fillStyle = snakeColor;
+      ctx.fillStyle = '#90ee90'
+      // ctx.fillStyle = snakeColor;
       ctx.beginPath();
       ctx.arc(part.x + grid/2, part.y + grid/2, grid/2 + 3, 0, 2 * Math.PI);
       ctx.fill();
-
-      // 眼睛
       ctx.fillStyle = 'black';
       ctx.beginPath();
       ctx.arc(part.x + grid/2 - 4, part.y + grid/2 - 4, 2, 0, 2 * Math.PI);
       ctx.arc(part.x + grid/2 + 4, part.y + grid/2 - 4, 2, 0, 2 * Math.PI);
       ctx.fill();
     } else {
-      // 蛇身
-      ctx.fillStyle = snakeColor;
+      ctx.fillStyle = '#90ee90';
+      // ctx.fillStyle = snakeColor;
       ctx.beginPath();
       ctx.arc(part.x + grid/2, part.y + grid/2, grid/2 - 2, 0, 2 * Math.PI);
       ctx.fill();
@@ -223,78 +176,72 @@ function gameLoop() {
   });
 
   if (snake[0].x < 0 || snake[0].x >= canvas.width || snake[0].y < 0 || snake[0].y >= canvas.height) {
-    resetGame();
+    isGameRunning = false;
+    resetGame(true);
+    document.getElementById('startGameBtn').style.display = '';
+    return;
   }
 
   for (let i = 4; i < snake.length; i++) {
     if (snake[0].x === snake[i].x && snake[0].y === snake[i].y) {
-      resetGame();
+      isGameRunning = false;
+      resetGame(true);
+      document.getElementById('startGameBtn').style.display = '';
+      return;
     }
   }
-  updateScoreboard(); // 每一輪遊戲循環後更新分數
-}
-
-function resetGame() {
-  snake = [{ x: 160, y: 160 }];
-  dx = grid;
-  dy = 0;
-  apple = { x: getRandomPosition(), y: getRandomPosition() };
-  score = 0;
-  speed = 200;
-  deathCount++;
   updateScoreboard();
 }
 
-let count = 0;
+// === 控制 ===
 document.addEventListener('keydown', (e) => {
+  if (!isGameRunning) return;
   if (e.key === 'ArrowLeft' && dx === 0) {
-    dx = -grid;
-    dy = 0;
+    dx = -grid; dy = 0;
   } else if (e.key === 'ArrowUp' && dy === 0) {
-    dx = 0;
-    dy = -grid;
+    dx = 0; dy = -grid;
   } else if (e.key === 'ArrowRight' && dx === 0) {
-    dx = grid;
-    dy = 0;
+    dx = grid; dy = 0;
   } else if (e.key === 'ArrowDown' && dy === 0) {
-    dx = 0;
-    dy = grid;
+    dx = 0; dy = grid;
   }
 });
-
 document.getElementById('leftBtn').addEventListener('click', () => {
-  if (dx === 0) {
-    dx = -grid;
-    dy = 0;
-  }
+  if (!isGameRunning) return;
+  if (dx === 0) { dx = -grid; dy = 0; }
 });
-
 document.getElementById('upBtn').addEventListener('click', () => {
-  if (dy === 0) {
-    dx = 0;
-    dy = -grid;
-  }
+  if (!isGameRunning) return;
+  if (dy === 0) { dx = 0; dy = -grid; }
 });
-
 document.getElementById('rightBtn').addEventListener('click', () => {
-  if (dx === 0) {
-    dx = grid;
-    dy = 0;
-  }
+  if (!isGameRunning) return;
+  if (dx === 0) { dx = grid; dy = 0; }
 });
-
 document.getElementById('downBtn').addEventListener('click', () => {
-  if (dy === 0) {
-    dx = 0;
-    dy = grid;
-  }
+  if (!isGameRunning) return;
+  if (dy === 0) { dx = 0; dy = grid; }
 });
 
-
+// === 更新按鈕 ===
 document.getElementById('updateBtn').onclick = function() {
-alert('v0.1 \n- ===新增===\n- 蛇身變色\n- 音效優化\n- ===修復===\n- 蘋果會超出範圍界線問題 \n- 更多功能陸續推出！');
+  alert('v0.2 \n- ===新增===\n- 開始按鈕特效 \n 音效優化\n- ===修復===\n- 蘋果隨機產生位置不貼近邊界 \n- 蛇會亂數變黑色問題！');
 };
 
+// === 開始遊戲按鈕 ===
+document.getElementById('startGameBtn').addEventListener('click', () => {
+  if (!isGameRunning) {
+    isGameRunning = true;
+    bgAudio.play();
+    document.getElementById('startGameBtn').style.display = 'none';
+    resetGame(false);
+    gameLoop();
+  }
+});
+
+// 預設初始化
+resetGame(false);
+updateScoreboard();
 </script>
 </body>
 </html>
