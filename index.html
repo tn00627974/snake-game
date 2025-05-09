@@ -61,15 +61,54 @@
     .scoreboard div {
       font-size: 20px;
     }
+    .startBtn{
+      position : fixed ;
+      display : flex;
+      align-items: center;
+      justify-content : center;
+      font-size : 30px; 
+      padding : 10px ; background-color: #fff; 
+      color: #1e3c72; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer;
+    }
+    .updateBtn{
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 200;
+      font-size: 18px;
+      padding: 8px 18px;
+      background: #ffee00;
+      color: #1e3c72;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
   </style>
+  <button id="startGameBtn" class="startBtn">開始遊戲</button>
   <script>
     // 背景音效
     const bgAudio = new Audio('./audio/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3');
     bgAudio.loop = true;
-    bgAudio.volume = 0.5;
+    bgAudio.volume = 0.1;
+
+    let isGameRunning = false;
+    document.getElementById('startGameBtn').addEventListener('click', () => {
+  if (!isGameRunning) {
+    isGameRunning = true; // 標記遊戲正在運行
+    bgAudio.play(); // 播放背景音樂
+    document.getElementById('startGameBtn').style.display = 'none'; // 隱藏按鈕
+    resetGame(); // 重置遊戲
+    requestAnimationFrame(gameLoop); // 開始遊戲循環
+  }
+});
+
 
     // 吃蘋果音效
-    const eatAppleAudio = new Audio('./audio/hitting.mp3');URL
+    const eatAppleAudio = new Audio('./audio/hitting.mp3');
     bgAudio.volume = 0.1; 
 
     // 修正吃蘋果音效的延遲問題
@@ -77,9 +116,13 @@
       eatAppleAudio.currentTime = 0; // 重置播放時間
       eatAppleAudio.play(); // 播放音效
     }
+    document.getElementById('updateBtn').onclick = function() {
+  alert('v0.1 新增：\n- 蛇身變色\n- 背景音效 \n- 修復:蘋果超出範圍會吃不到的問題 \n- 更多功能陸續推出！');
+};
   </script>
 </head>
 <body onload="bgAudio.play()">
+  <button id="updateBtn" class="updateBtn">更新項目</button>
 <h1>貪食蛇</h1>
 <div class="scoreboard">
   <div>得分: <span id="score">0</span></div>
@@ -100,7 +143,6 @@
 </div>
 
 <script>
-  
 /// 貪食蛇遊戲
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -120,6 +162,7 @@ let score = 0;
 let highScore = 0;
 let deathCount = 0;
 let speed = initialSpeed; // 降低蛇的初始速度
+let snakeColor = '#7ccd7c';
 
 function getRandomPosition() {
   return Math.floor(Math.random() * 20) * grid;
@@ -147,23 +190,19 @@ function gameLoop() {
     score++;
     if (score > highScore) highScore = score;
     if (speed > 20) speed -= 2;
-
+    snakeColor = '#' + Math.floor(Math.random()*16777215).toString(16);
     playEatAppleSound(); // 播放吃蘋果音效
   } else {
     snake.pop();
   }
 
-  // ctx.fillStyle = 'pink';
-  // ctx.beginPath();
-  // ctx.arc(apple.x + grid/2, apple.y + grid/2, grid/2 + 1, 0, 2 * Math.PI);
-  // ctx.fill();
   ctx.drawImage(appleImg, apple.x, apple.y, grid*1.5, grid*1.5);
 
   // 畫蛇
   snake.forEach((part, index) => {
     if (index === 0) {
       // 蛇頭
-      ctx.fillStyle = '#90ee90';
+      ctx.fillStyle = snakeColor;
       ctx.beginPath();
       ctx.arc(part.x + grid/2, part.y + grid/2, grid/2 + 3, 0, 2 * Math.PI);
       ctx.fill();
@@ -176,7 +215,7 @@ function gameLoop() {
       ctx.fill();
     } else {
       // 蛇身
-      ctx.fillStyle = '#7ccd7c';
+      ctx.fillStyle = snakeColor;
       ctx.beginPath();
       ctx.arc(part.x + grid/2, part.y + grid/2, grid/2 - 2, 0, 2 * Math.PI);
       ctx.fill();
@@ -251,7 +290,11 @@ document.getElementById('downBtn').addEventListener('click', () => {
   }
 });
 
-requestAnimationFrame(gameLoop);
+
+document.getElementById('updateBtn').onclick = function() {
+alert('v0.1 \n- ===新增===\n- 蛇身變色\n- 音效優化\n- ===修復===\n- 蘋果會超出範圍界線問題 \n- 更多功能陸續推出！');
+};
+
 </script>
 </body>
 </html>
