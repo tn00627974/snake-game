@@ -6,6 +6,8 @@
   <title>貪食蛇</title>
   <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet"> -->
   <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 </head>
 <body>
   <button id="updateBtn" class="updateBtn">更新項目</button>
@@ -35,27 +37,42 @@
     </span>
   </button>
 
-  <h1>貪食蛇</h1>
-  <div class="scoreboard">
-    <div>得分 : <span id="score">0</span></div>
-    <div>最高得分 : <span id="highScore">0</span></div>
-    <div>死亡次數: <span id="deathCount">0</span></div>
+  <div id="gameArea">
+    <button id="screenshotBtn" onclick="downloadScreenshot()">截圖</button>
+    <h1>貪食蛇</h1>
+    <div class="scoreboard">
+      <div>得分 : <span id="score">0</span></div>
+      <div>最高得分 : <span id="highScore">0</span></div>
+      <div>死亡次數: <span id="deathCount">0</span></div>
+    </div>
+
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="controls">
+      <div></div>
+      <button class="control-btn" id="upBtn">⬆️</button>
+      <div></div>
+      <button class="control-btn" id="leftBtn">⬅️</button>
+      <button class="control-btn" id="downBtn">⬇️</button>
+      <button class="control-btn" id="rightBtn">➡️</button>
+      <!-- <div></div>
+      <div></div>
+      <div></div> -->
+    </div>
   </div>
-  <canvas id="gameCanvas" width="400" height="400"></canvas>
-  <div class="controls">
-    <div></div>
-    <button class="control-btn" id="upBtn">⬆️</button>
-    <div></div>
-    <button class="control-btn" id="leftBtn">⬅️</button>
-    <button class="control-btn" id="downBtn">⬇️</button>
-    <button class="control-btn" id="rightBtn">➡️</button>
-    <!-- <div></div>
-    <div></div>
-    <div></div> -->
-  </div>
+
 
 
 <script>
+function downloadScreenshot() {
+    // 只截取 #gameArea 區塊，包含分數、標題、canvas、按鈕
+    html2canvas(document.getElementById('gameArea')).then(function(canvas) {
+        const link = document.createElement('a');
+        link.download = 'game_screenshot.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+}
+
 
 // === 音效與變數 ===
 const bgAudio = new Audio('./audio/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3');
@@ -75,7 +92,8 @@ const ctx = canvas.getContext('2d');
 const grid = 20;
 const initialSpeed = 200;
 const appleImg = new Image();
-appleImg.src = 'https://cdn-icons-png.flaticon.com/512/415/415682.png';
+// appleImg.src = 'https://cdn-icons-png.flaticon.com/512/415/415682.png';
+appleImg.src = 'images/apple.png';
 
 let snake, apple, dx, dy, score, highScore = 0, deathCount = 0, speed, snakeColor, count, 
 isGameRunning = false;
@@ -226,11 +244,11 @@ document.getElementById('downBtn').addEventListener('click', () => {
 // === 更新按鈕 ===
 document.getElementById('updateBtn').onclick = function() {
   alert([
-    'v0.2',
+    'v0.03',
     '=== 新增 ===',
-    '• 開始按鈕特效',
-    '• 音效優化',
-    '',
+    '• 方向鍵按鈕點擊特效',
+    '• 得分字體 : Galano Grotesque',
+    '•遊戲截圖功能',
     '=== 修復 ===',
     '• 蘋果隨機產生位置不貼近邊界',
     '• 蛇會亂數變黑色問題！'
@@ -247,6 +265,7 @@ document.getElementById('startGameBtn').addEventListener('click', () => {
     gameLoop();
   }
 });
+
 
 // 預設初始化
 resetGame(false);
