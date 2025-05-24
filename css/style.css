@@ -1,12 +1,12 @@
 #gameCanvas {
-  max-width: 100vw;
-  max-height: 60vw;
   width: 100%;
   height: auto;
-  display: block;
-  margin: 0 auto;
+  max-width: 100vw;
+  max-height: 60vw;
   background: #222;
   border-radius: 10px;
+  display: block;
+  margin: 0 auto;
 }
 
 #screenshotBtn {
@@ -20,25 +20,48 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
-}
-#gameArea {
-  position: relative;
+  font-size: 16px;
+  width: auto; /* 移除固定寬度 */
+  min-width: 60px; /* 設定最小寬度 */
+  white-space: nowrap; /* 防止文字換行 */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
+#gameArea {
+  position: relative;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+
 /* 手機板調整 */
-@media (max-width: 600px) {
+@media (max-width: 390px) {
+  body {
+    padding: 0 2vw;
+  }
   #gameCanvas {
     max-width: 98vw;
     max-height: 98vw;
   }
+  #screenshotBtn {
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+  }
   .scoreboard, .controls {
     font-size: 1.2em;
   }
-  body {
-    padding: 0 2vw;
+  .updateBtn {
+    top: 8px;
+    left: 8px;
+    font-size: 14px;
+    padding: 6px 12px;
   }
 }
 
+/* 桌面預設：彈性排版與適當單位 */
 body {
   font-family: "Galano Grotesque", Poppins, Montserrat, sans-serif;
   background: linear-gradient(to bottom, #1e3c72, #2a5298);
@@ -46,9 +69,10 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
   color: #fff;
+  padding: 0 24px;
 }
 h1 {
   margin-bottom: 20px;
@@ -85,11 +109,11 @@ canvas {
   background: #ffee00;
 }
 .scoreboard {
-  font-size: 10px;
-  margin-top: 10px;
   display: flex;
   justify-content: space-between;
-  width: 400px;
+  width: 100%;
+  font-size: 1.1em;
+  margin-top: 10px;
 }
 .scoreboard div {
   font-size: 18px;

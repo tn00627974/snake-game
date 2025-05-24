@@ -1,24 +1,31 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>貪食蛇</title>
   <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet"> -->
   <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 </head>
+
 <body>
   <button id="updateBtn" class="updateBtn">更新項目</button>
-    <!-- 修改開始遊戲按鈕，使用 .button 樣式與動畫字母 -->
+  <!-- 修改開始遊戲按鈕，使用 .button 樣式與動畫字母 -->
   <button id="startGameBtn" class="startButton" type="button">
     <span class="outline"></span>
     <span class="state state--default">
       <span class="icon">
-        <svg 
-        
-        xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-worm-icon lucide-worm"><path d="m19 12-1.5 3"/><path d="M19.63 18.81 22 20"/><path d="M6.47 8.23a1.68 1.68 0 0 1 2.44 1.93l-.64 2.08a6.76 6.76 0 0 0 10.16 7.67l.42-.27a1 1 0 1 0-2.73-4.21l-.42.27a1.76 1.76 0 0 1-2.63-1.99l.64-2.08A6.66 6.66 0 0 0 3.94 3.9l-.7.4a1 1 0 1 0 2.55 4.34z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="lucide lucide-worm-icon lucide-worm">
+          <path d="m19 12-1.5 3" />
+          <path d="M19.63 18.81 22 20" />
+          <path
+            d="M6.47 8.23a1.68 1.68 0 0 1 2.44 1.93l-.64 2.08a6.76 6.76 0 0 0 10.16 7.67l.42-.27a1 1 0 1 0-2.73-4.21l-.42.27a1.76 1.76 0 0 1-2.63-1.99l.64-2.08A6.66 6.66 0 0 0 3.94 3.9l-.7.4a1 1 0 1 0 2.55 4.34z" />
+        </svg>
       </span>
       <p>
         <span style="--i:1">開</span>
@@ -38,7 +45,7 @@
   </button>
 
   <div id="gameArea">
-    <button id="screenshotBtn" onclick="downloadScreenshot()">截圖</button>
+    <button id="screenshotBtn" onclick="downloadScreenshot()">手機截圖</button>
     <h1>貪食蛇</h1>
     <div class="scoreboard">
       <div>得分 : <span id="score">0</span></div>
@@ -54,222 +61,223 @@
       <button class="control-btn" id="leftBtn">⬅️</button>
       <button class="control-btn" id="downBtn">⬇️</button>
       <button class="control-btn" id="rightBtn">➡️</button>
-      <!-- <div></div>
-      <div></div>
-      <div></div> -->
     </div>
   </div>
 
-
-
-<script>
-function downloadScreenshot() {
-    // 只截取 #gameArea 區塊，包含分數、標題、canvas、按鈕
-    html2canvas(document.getElementById('gameArea')).then(function(canvas) {
+  <script>
+    function downloadScreenshot() {
+      const options = {
+      backgroundColor: '#222', // 設定為與 canvas 相同的黑色背景
+      useCORS: true,
+      allowTaint: true,
+    };
+      // 只截取 #gameArea 區塊，包含分數、標題、canvas、按鈕
+      const gameArea = document.getElementById('gameArea');
+      html2canvas(gameArea,options).then(function (canvas) {
         const link = document.createElement('a');
         link.download = 'game_screenshot.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
-    });
-}
-
-
-// === 音效與變數 ===
-const bgAudio = new Audio('./audio/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3');
-bgAudio.loop = true;
-bgAudio.volume = 0.1;
-const eatAppleAudio = new Audio('./audio/hitting.mp3');
-eatAppleAudio.volume = 0.1;
-
-function playEatAppleSound() {
-  eatAppleAudio.currentTime = 0;
-  eatAppleAudio.play();
-}
-
-// === 遊戲主程式 ===
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const grid = 20;
-const initialSpeed = 200;
-const appleImg = new Image();
-// appleImg.src = 'https://cdn-icons-png.flaticon.com/512/415/415682.png';
-appleImg.src = 'images/apple.png';
-
-let snake, apple, dx, dy, score, highScore = 0, deathCount = 0, speed, snakeColor, count, 
-isGameRunning = false;
-
-function getRandomPosition() {
-  const min = 1;
-  const max = 18;
-  return Math.floor(Math.random() * (max - min + 1) + min) * grid;
-}
-
-function updateScoreboard() {
-  document.getElementById('score').innerText = score;
-  document.getElementById('highScore').innerText = highScore;
-  document.getElementById('deathCount').innerText = deathCount;
-}
-
-function drawSnakeAndApple() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(appleImg, apple.x, apple.y, grid*1.5, grid*1.5);
-  snake.forEach((part, index) => {
-    if (index === 0) {
-      ctx.fillStyle = '#90ee90';
-      ctx.beginPath();
-      ctx.arc(part.x + grid/2, part.y + grid/2, grid/2 + 3, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.fillStyle = 'black';
-      ctx.beginPath();
-      ctx.arc(part.x + grid/2 - 4, part.y + grid/2 - 4, 2, 0, 2 * Math.PI);
-      ctx.arc(part.x + grid/2 + 4, part.y + grid/2 - 4, 2, 0, 2 * Math.PI);
-      ctx.fill();
-    } else {
-      ctx.fillStyle = '#90ee90';
-      ctx.beginPath();
-      ctx.arc(part.x + grid/2, part.y + grid/2, grid/2 - 2, 0, 2 * Math.PI);
-      ctx.fill();
+      });
     }
-  });
-}
 
-function resetGame(isDeath = false) {
-  snake = [{ x: 160, y: 160 }];
-  dx = grid;
-  dy = 0;
-  apple = { x: getRandomPosition(), y: getRandomPosition() };
-  score = 0;
-  speed = initialSpeed;
-  snakeColor = '#7ccd7c';
-  count = Math.floor(speed / 10); // 讓 gameLoop 立即執行
-  if (isDeath) deathCount++;
-  updateScoreboard();
-  drawSnakeAndApple();
-}
 
-function gameLoop() {
-  if (!isGameRunning) return;
-  requestAnimationFrame(gameLoop);
+    // === 音效與變數 ===
+    const bgAudio = new Audio('./audio/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3');
+    bgAudio.loop = true;
+    bgAudio.volume = 0.1;
+    const eatAppleAudio = new Audio('./audio/hitting.mp3');
+    eatAppleAudio.volume = 0.1;
 
-  if (++count < speed / 10) return;
-  count = 0;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  snake.unshift({ x: snake[0].x + dx, y: snake[0].y + dy });
-
-  if (snake[0].x === apple.x && snake[0].y === apple.y) {
-    apple.x = getRandomPosition();
-    apple.y = getRandomPosition();
-    score++;
-    if (score > highScore) highScore = score;
-    if (speed > 20) speed -= 2;
-    // snakeColor = '#' + Math.floor(Math.random()*16777215).toString(16);
-    playEatAppleSound();
-  } else {
-    snake.pop();
-  }
-
-  ctx.drawImage(appleImg, apple.x, apple.y, grid*1.5, grid*1.5);
-
-  snake.forEach((part, index) => {
-    if (index === 0) {
-      ctx.fillStyle = '#90ee90'
-      // ctx.fillStyle = snakeColor;
-      ctx.beginPath();
-      ctx.arc(part.x + grid/2, part.y + grid/2, grid/2 + 3, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.fillStyle = 'black';
-      ctx.beginPath();
-      ctx.arc(part.x + grid/2 - 4, part.y + grid/2 - 4, 2, 0, 2 * Math.PI);
-      ctx.arc(part.x + grid/2 + 4, part.y + grid/2 - 4, 2, 0, 2 * Math.PI);
-      ctx.fill();
-    } else {
-      ctx.fillStyle = '#90ee90';
-      // ctx.fillStyle = snakeColor;
-      ctx.beginPath();
-      ctx.arc(part.x + grid/2, part.y + grid/2, grid/2 - 2, 0, 2 * Math.PI);
-      ctx.fill();
+    function playEatAppleSound() {
+      eatAppleAudio.currentTime = 0;
+      eatAppleAudio.play();
     }
-  });
 
-  if (snake[0].x < 0 || snake[0].x >= canvas.width || snake[0].y < 0 || snake[0].y >= canvas.height) {
-    isGameRunning = false;
-    resetGame(true);
-    document.getElementById('startGameBtn').style.display = '';
-    return;
-  }
+    // === 遊戲主程式 ===
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const grid = 20;
+    const initialSpeed = 200;
+    const appleImg = new Image();
+    // appleImg.src = 'https://cdn-icons-png.flaticon.com/512/415/415682.png';
+    appleImg.src = 'images/apple.png';
 
-  for (let i = 4; i < snake.length; i++) {
-    if (snake[0].x === snake[i].x && snake[0].y === snake[i].y) {
+    let snake, apple, dx, dy, score, highScore = 0, deathCount = 0, speed, snakeColor, count,
       isGameRunning = false;
-      resetGame(true);
-      document.getElementById('startGameBtn').style.display = '';
-      return;
+
+    function getRandomPosition() {
+      const min = 1;
+      const max = 18;
+      return Math.floor(Math.random() * (max - min + 1) + min) * grid;
     }
-  }
-  updateScoreboard();
-}
 
-// === 控制 ===
-document.addEventListener('keydown', (e) => {
-  if (!isGameRunning) return;
-  if (e.key === 'ArrowLeft' && dx === 0) {
-    dx = -grid; dy = 0;
-  } else if (e.key === 'ArrowUp' && dy === 0) {
-    dx = 0; dy = -grid;
-  } else if (e.key === 'ArrowRight' && dx === 0) {
-    dx = grid; dy = 0;
-  } else if (e.key === 'ArrowDown' && dy === 0) {
-    dx = 0; dy = grid;
-  }
-});
-document.getElementById('leftBtn').addEventListener('click', () => {
-  if (!isGameRunning) return;
-  if (dx === 0) { dx = -grid; dy = 0; }
-});
-document.getElementById('upBtn').addEventListener('click', () => {
-  if (!isGameRunning) return;
-  if (dy === 0) { dx = 0; dy = -grid; }
-});
-document.getElementById('rightBtn').addEventListener('click', () => {
-  if (!isGameRunning) return;
-  if (dx === 0) { dx = grid; dy = 0; }
-});
-document.getElementById('downBtn').addEventListener('click', () => {
-  if (!isGameRunning) return;
-  if (dy === 0) { dx = 0; dy = grid; }
-});
+    function updateScoreboard() {
+      document.getElementById('score').innerText = score;
+      document.getElementById('highScore').innerText = highScore;
+      document.getElementById('deathCount').innerText = deathCount;
+    }
 
-// === 更新按鈕 ===
-document.getElementById('updateBtn').onclick = function() {
-  alert([
-    'v0.03',
-    '=== 新增 ===',
-    '• 方向鍵按鈕點擊特效',
-    '• 得分字體 : Galano Grotesque',
-    '•遊戲截圖功能',
-    '=== 修復 ===',
-    '• 蘋果隨機產生位置不貼近邊界',
-    '• 蛇會亂數變黑色問題！'
-  ].join('\n'));
-};
+    function drawSnakeAndApple() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(appleImg, apple.x, apple.y, grid * 1.5, grid * 1.5);
+      snake.forEach((part, index) => {
+        if (index === 0) {
+          ctx.fillStyle = '#90ee90';
+          ctx.beginPath();
+          ctx.arc(part.x + grid / 2, part.y + grid / 2, grid / 2 + 3, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.fillStyle = 'black';
+          ctx.beginPath();
+          ctx.arc(part.x + grid / 2 - 4, part.y + grid / 2 - 4, 2, 0, 2 * Math.PI);
+          ctx.arc(part.x + grid / 2 + 4, part.y + grid / 2 - 4, 2, 0, 2 * Math.PI);
+          ctx.fill();
+        } else {
+          ctx.fillStyle = '#90ee90';
+          ctx.beginPath();
+          ctx.arc(part.x + grid / 2, part.y + grid / 2, grid / 2 - 2, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      });
+    }
 
-// === 開始遊戲按鈕 ===
-document.getElementById('startGameBtn').addEventListener('click', () => {
-  if (!isGameRunning) {
-    isGameRunning = true;
-    bgAudio.play();
-    document.getElementById('startGameBtn').style.display = 'none';
+    function resetGame(isDeath = false) {
+      snake = [{ x: 160, y: 160 }];
+      dx = grid;
+      dy = 0;
+      apple = { x: getRandomPosition(), y: getRandomPosition() };
+      score = 0;
+      speed = initialSpeed;
+      snakeColor = '#7ccd7c';
+      count = Math.floor(speed / 10); // 讓 gameLoop 立即執行
+      if (isDeath) deathCount++;
+      updateScoreboard();
+      drawSnakeAndApple();
+    }
+
+    function gameLoop() {
+      if (!isGameRunning) return;
+      requestAnimationFrame(gameLoop);
+
+      if (++count < speed / 10) return;
+      count = 0;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      snake.unshift({ x: snake[0].x + dx, y: snake[0].y + dy });
+
+      if (snake[0].x === apple.x && snake[0].y === apple.y) {
+        apple.x = getRandomPosition();
+        apple.y = getRandomPosition();
+        score++;
+        if (score > highScore) highScore = score;
+        if (speed > 20) speed -= 2;
+        // snakeColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+        playEatAppleSound();
+      } else {
+        snake.pop();
+      }
+
+      ctx.drawImage(appleImg, apple.x, apple.y, grid * 1.5, grid * 1.5);
+
+      snake.forEach((part, index) => {
+        if (index === 0) {
+          ctx.fillStyle = '#90ee90'
+          // ctx.fillStyle = snakeColor;
+          ctx.beginPath();
+          ctx.arc(part.x + grid / 2, part.y + grid / 2, grid / 2 + 3, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.fillStyle = 'black';
+          ctx.beginPath();
+          ctx.arc(part.x + grid / 2 - 4, part.y + grid / 2 - 4, 2, 0, 2 * Math.PI);
+          ctx.arc(part.x + grid / 2 + 4, part.y + grid / 2 - 4, 2, 0, 2 * Math.PI);
+          ctx.fill();
+        } else {
+          ctx.fillStyle = '#90ee90';
+          // ctx.fillStyle = snakeColor;
+          ctx.beginPath();
+          ctx.arc(part.x + grid / 2, part.y + grid / 2, grid / 2 - 2, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      });
+
+      if (snake[0].x < 0 || snake[0].x >= canvas.width || snake[0].y < 0 || snake[0].y >= canvas.height) {
+        isGameRunning = false;
+        resetGame(true);
+        document.getElementById('startGameBtn').style.display = '';
+        return;
+      }
+
+      for (let i = 4; i < snake.length; i++) {
+        if (snake[0].x === snake[i].x && snake[0].y === snake[i].y) {
+          isGameRunning = false;
+          resetGame(true);
+          document.getElementById('startGameBtn').style.display = '';
+          return;
+        }
+      }
+      updateScoreboard();
+    }
+
+    // === 控制 ===
+    document.addEventListener('keydown', (e) => {
+      if (!isGameRunning) return;
+      if (e.key === 'ArrowLeft' && dx === 0) {
+        dx = -grid; dy = 0;
+      } else if (e.key === 'ArrowUp' && dy === 0) {
+        dx = 0; dy = -grid;
+      } else if (e.key === 'ArrowRight' && dx === 0) {
+        dx = grid; dy = 0;
+      } else if (e.key === 'ArrowDown' && dy === 0) {
+        dx = 0; dy = grid;
+      }
+    });
+    document.getElementById('leftBtn').addEventListener('click', () => {
+      if (!isGameRunning) return;
+      if (dx === 0) { dx = -grid; dy = 0; }
+    });
+    document.getElementById('upBtn').addEventListener('click', () => {
+      if (!isGameRunning) return;
+      if (dy === 0) { dx = 0; dy = -grid; }
+    });
+    document.getElementById('rightBtn').addEventListener('click', () => {
+      if (!isGameRunning) return;
+      if (dx === 0) { dx = grid; dy = 0; }
+    });
+    document.getElementById('downBtn').addEventListener('click', () => {
+      if (!isGameRunning) return;
+      if (dy === 0) { dx = 0; dy = grid; }
+    });
+
+    // === 更新按鈕 ===
+    document.getElementById('updateBtn').onclick = function () {
+      alert([
+        'v0.04',
+        // '=== 新增 ===',
+        // '• 方向鍵按鈕點擊特效',
+        // '• 得分字體 : Galano Grotesque',
+        // '•遊戲截圖功能',
+        '=== 修復 ===',
+        '• (截圖)手機截圖會跑版問題',
+      ].join('\n'));
+    };
+
+    // === 開始遊戲按鈕 ===
+    document.getElementById('startGameBtn').addEventListener('click', () => {
+      if (!isGameRunning) {
+        isGameRunning = true;
+        bgAudio.play();
+        document.getElementById('startGameBtn').style.display = 'none';
+        resetGame(false);
+        gameLoop();
+      }
+    });
+
+
+    // 預設初始化
     resetGame(false);
-    gameLoop();
-  }
-});
-
-
-// 預設初始化
-resetGame(false);
-updateScoreboard();
-</script>
+    updateScoreboard();
+  </script>
 </body>
+
 </html>
